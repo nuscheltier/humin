@@ -1,0 +1,6 @@
+[package]
+name = "humin"
+version = "0.1.0"
+authors = ["nuscheltier <jonas@farel.de>"]
+
+[dependencies]
