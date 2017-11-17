@@ -48,6 +48,6 @@ impl Edge {
     }
 
     pub fn remove_property(&mut self, key: String) {
-        self.properties.remove(key);
+        self.properties.remove(&key);
     }
 }
