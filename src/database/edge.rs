@@ -28,7 +28,7 @@ impl Edge {
     //setter
     //fn set_id(&self) -> u64 This should be done with initialization
     //a new Edge should have an ID, a Title, an origin node and a target node. Properties aren't needed
-    pub fn new(id: u64, title: String, origin: u64, target: u64) -> Edge {
+    pub fn new(id: u64, origin: u64, target: u64) -> Edge {
         let prop = HashMap::new();
         Edge {
             id: id,
