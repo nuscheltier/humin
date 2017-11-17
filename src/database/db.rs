@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use database::property::Property;
 use database::edge::Edge;
 use database::node::Node;
 use database::error::TitleError;

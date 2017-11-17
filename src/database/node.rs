@@ -29,4 +29,8 @@ impl Node {
     pub fn change_property(&mut self, key: String, value: String) {
         self.properties.insert(key, value);
     }
+
+    pub fn remove_property(&mut self, key: String) {
+        self.properties.remove(key);
+    }
 }

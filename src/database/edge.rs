@@ -39,4 +39,15 @@ impl Edge {
     }
 
     //no possible change of ID, Origin and Target.
+    pub fn add_property(&mut self, key: String, value: String) {
+        self.properties.insert(key, value);
+    }
+
+    pub fn change_property(&mut self, key: String, value: String) {
+        self.properties.insert(key, value);
+    }
+
+    pub fn remove_property(&mut self, key: String) {
+        self.properties.remove(key);
+    }
 }
