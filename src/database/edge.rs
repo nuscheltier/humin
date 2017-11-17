@@ -1,9 +1,8 @@
-use database::properties::Properties;
+use std::collections::HashMap;
 
 pub struct Edge {
     id: u64,
-    title: String,
-    properties: Properties,
+    properties: HashMap<String, String>,
     origin: u64,
     target: u64
 }
@@ -14,11 +13,7 @@ impl Edge {
         self.id
     }
 
-    fn get_title(&self) -> &String {
-        &self.title
-    }
-
-    fn get_properties(&self) -> &Properties {
+    fn get_properties(&self) -> &HashMap<String, String> {
         &self.properties
     }
 
@@ -34,19 +29,13 @@ impl Edge {
     //fn set_id(&self) -> u64 This should be done with initialization
     //a new Edge should have an ID, a Title, an origin node and a target node. Properties aren't needed
     pub fn new(id: u64, title: String, origin: u64, target: u64) -> Edge {
-        let prop = Properties::new();
+        let prop = HashMap::new();
         Edge {
             id: id,
-            title: title,
             origin: origin,
             target: target,
             properties: prop
         }
-    }
-
-    //The title can be changed
-    fn set_title(&mut self, title: String) {
-        self.title = title;
     }
 
     //no possible change of ID, Origin and Target.
