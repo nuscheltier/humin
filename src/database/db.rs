@@ -56,34 +56,24 @@ impl DB {
         }
     }
 
-    //is the node in any relationship with another node by one specific property?
-    pub fn find_target_by_property(&mut self, orig: u64, prop: String) -> Vec<u64> { //Map<IntoIter, FnMut(u64,)> { //Vec<&mut Node> {
-        //let vec_edge: Vec<Edge> = Vec::new();
-        self.find_target_by_property_value(orig, prop, "".to_string())
-        /*let mut vec_ids: Vec<u64> = Vec::new();
-        //every edge_id that is originated in that node
-        let mut id_iter: Vec<u64> = Vec::new();
-        {
-            id_iter = self.find_node_by_id(orig).unwrap().get_origins().clone();
-        }
-        for id in id_iter {
-            let edge = self.find_edge_by_id(id).unwrap();
-            //do the properties of that particular edge have that property?
-            if edge.get_properties().keys().any(|ref x| x == &&prop) {
-                vec_ids.push(edge.get_target());
+    //it would be better if we saved the properties seperately - but only if time is of the essence and for really big databases should it be needed
+    pub fn find_node_by_property_value(&mut self, prop: String, prop_val: String) -> Vec<u64> {
+        //TODO: at the moment you have to know the exact value. 
+        let mut vec_ids: Vec<u64> = Vec::new();
+        for id in self.nodes.keys() {
+            if self.nodes.get(&id).unwrap().get_properties().keys().any(|ref x| x == &&prop) && self.nodes.get(&id).unwrap().get_properties().get(&prop).unwrap() == &prop_val {
+                vec_ids.push(*id);
             }
-        }*/
-        //let mut vec_nodes: Vec<&mut Node> = Vec::new();
-        /*vec_nodes = vec_ids.into_iter().map(|x| self.nodes.get_mut(&x).unwrap()).collect();*/
-        //vec_nodes = vec_ids.into_iter().map(|x| self.find_node_by_id(x).unwrap()).collect();
-        /*for target in vec_ids.into_iter() {
-            vec_nodes.push(self.find_node_by_id(target).unwrap());
-        }*/
-        //vec_nodes
-        //vec_ids.into_iter().map(|x| self.nodes.get_mut(&x).unwrap())
-        //vec_ids
+        }
+        vec_ids
     }
 
+    //is the node in any relationship with another node by one specific property?
+    pub fn find_target_by_property(&mut self, orig: u64, prop: String) -> Vec<u64> {
+        self.find_target_by_property_value(orig, prop, "".to_string())
+    }
+
+    //is the node in any relationship with another node by one specific property and property value?
     pub fn find_target_by_property_value(&mut self, orig: u64, prop: String, prop_val: String) -> Vec<u64> {
         let mut vec_ids: Vec<u64> = Vec::new();
 
@@ -132,6 +122,4 @@ impl DB {
         self.edges.insert(id, edge);
         id
     }
-    /*fn find_relation_node(node: Node) -> Vec<Edge> {
-    }*/
 }
