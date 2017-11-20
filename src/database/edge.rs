@@ -9,19 +9,19 @@ pub struct Edge {
 
 impl Edge {
     //getter
-    fn get_id(&self) -> u64 {
+    pub fn get_id(&self) -> u64 {
         self.id
     }
 
-    fn get_properties(&self) -> &HashMap<String, String> {
+    pub fn get_properties(&self) -> &HashMap<String, String> {
         &self.properties
     }
 
-    fn get_origin(&self) -> u64 {
+    pub fn get_origin(&self) -> u64 {
         self.origin
     }
 
-    fn get_target(&self) -> u64 {
+    pub fn get_target(&self) -> u64 {
         self.target
     }
 
