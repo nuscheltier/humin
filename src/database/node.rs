@@ -1,5 +1,12 @@
 use std::collections::HashMap;
 
+//TODO
+//enum Value {
+//  s(String),
+//  u(u64),
+//  i(i64)
+//  }
+
 pub struct Node {
     id: u64,
     origin: Vec<u64>,

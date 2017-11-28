@@ -8,8 +8,7 @@ use serde_json::Value;
 //use std::iter::{IntoIter, Map};
 use database::edge::Edge;
 use database::node::Node;
-use database::error::TitleError;
-use database::error::IDError;
+use database::error::{TitleError, IDError, DataValidError} ;
 
 pub struct DB {
     file: String,
@@ -80,11 +79,9 @@ impl DB {
     ////loads
     //TODO: we need a validator for the database
     //and error handling here
-    pub fn load_database(&mut self, name: String) {
-        self.edges.clear();
-        self.nodes.clear();
-        self.edges.shrink_to_fit();
-        self.nodes.shrink_to_fit();
+    pub fn load_database(&mut self, name: String) -> Result<(), DataValidError>{
+        let mut n_hash: HashMap<u64, Node> = HashMap::new();
+        let mut e_hash: HashMap<u64, Edge> = HashMap::new();
 
         let mut file_data = String::new();
         let mut f = File::open(name).unwrap();
@@ -92,41 +89,82 @@ impl DB {
         f.read_to_string(&mut file_data);
         let v: Value = serde_json::from_str(&file_data).unwrap();
         //nodes
+        if !v["nodes"].is_array() {
+            return Err(DataValidError);
+        }
         for node_object in v["nodes"].as_array().unwrap() {
+            if !node_object.is_object() {
+                return Err(DataValidError);
+            }
             let n = node_object.as_object().unwrap();
+            if !n["id"].is_u64() {
+                return Err(DataValidError);
+            }
             let mut node = Node::new(n["id"].as_u64().unwrap());
+            if !n["node"].is_object() {
+                return Err(DataValidError);
+            }
             let n_inner = n["node"].as_object().unwrap();
             //we need the origins and targets
             for o in n_inner["origins"].as_array().unwrap() {
+                if !o.is_u64() {
+                    return Err(DataValidError);
+                }
                 node.add_origin(o.as_u64().unwrap());
             }
             for t in n_inner["targets"].as_array().unwrap() {
+                if !t.is_u64() {
+                    return Err(DataValidError);
+                }
                 node.add_target(t.as_u64().unwrap());
             }
             //properties
             for p in n_inner["properties"].as_array().unwrap() {
+                if !p.is_object() {
+                    return Err(DataValidError);
+                }
                 let p_object = p.as_object().unwrap();
                 node.add_property(
                     p_object.keys().next().unwrap().as_str().to_string(),//.unwrap().to_string(),
                     p_object.values().next().unwrap().as_str().unwrap().to_string()
                 );
             }
-            self.nodes.insert(node.get_id(), node);
+            n_hash.insert(node.get_id(), node);
+        }
+        if !v["edges"].is_array() {
+            return Err(DataValidError);
         }
         //edges
         for edge_object in v["edges"].as_array().unwrap() {
+            if !edge_object.is_object() {
+                return Err(DataValidError);
+            }
             let e = edge_object.as_object().unwrap();
+            if !e["edge"].is_object() {
+                return Err(DataValidError);
+            }
             let e_inner = e["edge"].as_object().unwrap();
+            if !(e["id"].is_u64() && e_inner["origin"].is_u64() && e_inner["target"].is_u64()) {
+                return Err(DataValidError);
+            }
             let mut edge = Edge::new(e["id"].as_u64().unwrap(), e_inner["origin"].as_u64().unwrap(), e_inner["target"].as_u64().unwrap());
             for p in e_inner["properties"].as_array().unwrap() {
+                if !p.is_object() {
+                    return Err(DataValidError);
+                }
                 let p_object = p.as_object().unwrap();
                 edge.add_property(
                     p_object.keys().next().unwrap().as_str().to_string(),//.unwrap().to_string(),
                     p_object.values().next().unwrap().as_str().unwrap().to_string()
                 )
             }
-            self.edges.insert(edge.get_id(), edge);
+            e_hash.insert(edge.get_id(), edge);
         }
+        self.edges.clear();
+        self.nodes.clear();
+        self.edges = e_hash;
+        self.nodes = n_hash;
+        Ok(())
         /*for node in v["nodes"].iter() {
             let mut n = Node::new(node["id"]);
             for o in node["node"]["origin"] {
