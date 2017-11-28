@@ -1,4 +1,10 @@
+extern crate serde_json;
+
 use std::collections::HashMap;
+use std::fs::File;
+use std::io::prelude::*;
+
+use serde_json::Value;
 //use std::iter::{IntoIter, Map};
 use database::edge::Edge;
 use database::node::Node;
@@ -30,6 +36,104 @@ impl DB {
         //}
     }
     ////saves
+    //TODO: it should be easy doing this using serde_json
+    pub fn save_database(&self, name: String) {
+        //let mut json_string = String::new();
+        let mut nodes_string = String::new();
+        let mut edges_string = String::new();
+        for node in self.nodes.values() {
+            let mut vec_origin_string = String::new();
+            let mut vec_targets_string = String::new();
+            let mut vec_properties = String::new();
+            for i in node.get_origins() {
+                vec_origin_string.push_str(&format!("{},", i));
+            }
+            vec_origin_string.pop();
+            for i in node.get_targets() {
+                vec_targets_string.push_str(&format!("{},", i));
+            }
+            vec_targets_string.pop();
+            for prop in node.get_properties().keys() {
+                let value = node.get_properties().get(prop).unwrap();
+                vec_properties.push_str(&format!("{{\"{}\":\"{}\"}},", prop, value));
+            }
+            vec_properties.pop();
+
+            nodes_string.push_str(&format!("{{\"id\":{},\"node\":{{\"id\":{},\"origins\":[{}],\"targets\":[{}],\"properties\":[{}]}}}},", node.get_id(), node.get_id(), vec_origin_string, vec_targets_string, vec_properties));
+        }
+        println!("{}", nodes_string);
+        nodes_string.pop();
+        for edge in self.edges.values() {
+            let mut vec_properties = String::new();
+            for prop in edge.get_properties().keys() {
+                let value = edge.get_properties().get(prop).unwrap();
+                vec_properties.push_str(&format!("{{\"{}\":\"{}\"}},", prop, value));
+            }
+            vec_properties.pop();
+            edges_string.push_str(&format!("{{\"id\":{},\"edge\":{{\"id\":{},\"origin\":{},\"target\":{},\"properties\":[{}]}}}},", edge.get_id(), edge.get_id(), edge.get_origin(), edge.get_target(), vec_properties));
+        }
+        edges_string.pop();
+        let json_string = format!("{{\"nodes\":[{}],\"edges\":[{}]}}", nodes_string, edges_string);
+        println!("{}", json_string);
+    }
+
+    ////loads
+    //TODO: we need a validator for the database
+    //and error handling here
+    pub fn load_database(&mut self, name: String) {
+        self.edges.clear();
+        self.nodes.clear();
+        self.edges.shrink_to_fit();
+        self.nodes.shrink_to_fit();
+
+        let mut file_data = String::new();
+        let mut f = File::open(name).unwrap();
+
+        f.read_to_string(&mut file_data);
+        let v: Value = serde_json::from_str(&file_data).unwrap();
+        //nodes
+        for node_object in v["nodes"].as_array().unwrap() {
+            let n = node_object.as_object().unwrap();
+            let mut node = Node::new(n["id"].as_u64().unwrap());
+            let n_inner = n["node"].as_object().unwrap();
+            //we need the origins and targets
+            for o in n_inner["origins"].as_array().unwrap() {
+                node.add_origin(o.as_u64().unwrap());
+            }
+            for t in n_inner["targets"].as_array().unwrap() {
+                node.add_target(t.as_u64().unwrap());
+            }
+            //properties
+            for p in n_inner["properties"].as_array().unwrap() {
+                let p_object = p.as_object().unwrap();
+                node.add_property(
+                    p_object.keys().next().unwrap().as_str().to_string(),//.unwrap().to_string(),
+                    p_object.values().next().unwrap().as_str().unwrap().to_string()
+                );
+            }
+            self.nodes.insert(node.get_id(), node);
+        }
+        //edges
+        for edge_object in v["edges"].as_array().unwrap() {
+            let e = edge_object.as_object().unwrap();
+            let e_inner = e["edge"].as_object().unwrap();
+            let mut edge = Edge::new(e["id"].as_u64().unwrap(), e_inner["origin"].as_u64().unwrap(), e_inner["target"].as_u64().unwrap());
+            for p in e_inner["properties"].as_array().unwrap() {
+                let p_object = p.as_object().unwrap();
+                edge.add_property(
+                    p_object.keys().next().unwrap().as_str().to_string(),//.unwrap().to_string(),
+                    p_object.values().next().unwrap().as_str().unwrap().to_string()
+                )
+            }
+            self.edges.insert(edge.get_id(), edge);
+        }
+        /*for node in v["nodes"].iter() {
+            let mut n = Node::new(node["id"]);
+            for o in node["node"]["origin"] {
+                n.add_origin(o);
+            }
+        }*/
+    }
 
     /*fn find_node_by_title(&self, title: String) -> Result<&Node, TitleError> {
         if self.nodes_by_title.get(&title).is_some() {
@@ -121,5 +225,14 @@ impl DB {
         let edge = Edge::new(id, org, tar);
         self.edges.insert(id, edge);
         id
+    }
+
+    ////dels
+
+    pub fn del_node(&mut self, id: u64) {
+        //every edge that is found inside the origins and targets needs to be deleted too
+    }
+
+    pub fn del_edge(&mut self, id: u64) {
     }
 }
