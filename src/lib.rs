@@ -2,6 +2,7 @@
 extern crate serde_json;
 
 pub mod database;
+pub mod humin;
 
 #[cfg(test)]
 mod tests {

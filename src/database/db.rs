@@ -36,6 +36,8 @@ impl DB {
     }
     ////saves
     //TODO: it should be easy doing this using serde_json
+    //TODO: A to_string of the Database to use it in another format.
+    //TODO: In the same vein as above: a from_string
     pub fn save_database(&self, name: String) {
         //let mut json_string = String::new();
         let mut nodes_string = String::new();
@@ -269,8 +271,36 @@ impl DB {
 
     pub fn del_node(&mut self, id: u64) {
         //every edge that is found inside the origins and targets needs to be deleted too
+        let mut edge_origin_ids: Vec<u64> = Vec::new();
+        let mut edge_target_ids: Vec<u64> = Vec::new();
+        {
+            let mut node = self.nodes.get_mut(&id).unwrap();
+            edge_origin_ids = node.get_origins().clone();
+            edge_target_ids = node.get_targets().clone();
+        }
+
+        for edge in edge_origin_ids {
+            self.del_edge(edge);
+        }
+        for edge in edge_target_ids {
+            self.del_edge(edge);
+        }
+
+        self.nodes.remove(&id);
     }
 
     pub fn del_edge(&mut self, id: u64) {
+        let mut origin: u64 = 0;
+        let mut target: u64 = 0;
+        {
+            let mut edge = self.edges.get_mut(&id).unwrap();
+            origin = edge.get_origin();
+            target = edge.get_target();
+        }
+
+        self.nodes.get_mut(&origin).unwrap().del_origin(id as usize);
+        self.nodes.get_mut(&target).unwrap().del_target(id as usize);
+
+        self.edges.remove(&id);
     }
 }
