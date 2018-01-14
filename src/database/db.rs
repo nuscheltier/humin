@@ -269,6 +269,7 @@ impl DB {
 
     ////dels
 
+    //TODO: needs a result
     pub fn del_node(&mut self, id: u64) {
         //every edge that is found inside the origins and targets needs to be deleted too
         let mut edge_origin_ids: Vec<u64> = Vec::new();
