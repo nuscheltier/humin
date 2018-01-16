@@ -263,6 +263,8 @@ impl DB {
     pub fn new_edge(&mut self, org: u64, tar: u64) -> u64 {
         let id = self.edges.len() as u64;
         let edge = Edge::new(id, org, tar);
+        self.find_node_by_id(org).unwrap().add_origin(id);
+        self.find_node_by_id(tar).unwrap().add_target(id);
         self.edges.insert(id, edge);
         id
     }
