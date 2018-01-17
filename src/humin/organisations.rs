@@ -30,14 +30,26 @@ impl Groups {
     }
 
     //get a HashMap of all Organisations
-    pub fn get_all(&mut self) -> &HashMap<u64, Organisation> {
+    pub fn get_all(&self) -> &HashMap<u64, Organisation> {
         &self.groups
     }
 
+    pub fn get_all_mut(&mut self) -> &mut HashMap<u64, Organisation> {
+        &mut self.groups
+    }
+
     //get one specific Organisation
-    pub fn get(&mut self, id: u64) -> Result<&mut Organisation, &'static str> {
+    pub fn get_mut(&mut self, id: u64) -> Result<&mut Organisation, &'static str> {
         if self.groups.get(&id).is_some() {
             return Ok(self.groups.get_mut(&id).unwrap());
+        } else {
+            Err("Organisation not found.")
+        }
+    }
+
+    pub fn get(&self, id: u64) -> Result<&Organisation, &'static str> {
+        if self.groups.get(&id).is_some() {
+            return Ok(self.groups.get(&id).unwrap());
         } else {
             Err("Organisation not found.")
         }
