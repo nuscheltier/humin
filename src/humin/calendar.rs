@@ -43,8 +43,6 @@ impl Calendar {
             let edge_id = db.new_edge(node_id, id);
             let mut node = db.find_node_by_id(node_id).unwrap();
             node.add_property("Zeitpunkt".to_string(), date);
-            //it doesn't really matter whether it is an origin or a target of the edges
-            node.add_origin(edge_id);
             self.dates.push(node_id);
             Ok(())
         }
