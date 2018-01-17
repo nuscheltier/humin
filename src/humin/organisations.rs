@@ -2,12 +2,14 @@ use super::super::database::db::DB as DB;
 use std::collections::HashMap;
 //Groups is the struct to collect all Organisations. It's named to make it differentiate more
 //from Organisations.
+//Also it is the only way to actually build an Organisation and have it cataloged via the HashMap
 pub struct Groups {
     //groups: Vec<Organisation>
     groups: HashMap<u64, Organisation>
 }
 //Organisations should have a starting Event (their founding) and some people (the founders).
-//But for worldbuilding purposes it should be optional.
+//But for worldbuilding purposes it should be optional for building purposes.
+//The Name of the Organisation is not optional anymore.
 pub struct Organisation {
     node_id: u64,
     name: String
@@ -43,7 +45,7 @@ impl Groups {
 }
 
 impl Organisation {
-    pub fn new(db: &mut DB, name: String) -> Organisation {
+    fn new(db: &mut DB, name: String) -> Organisation {
         Organisation {
             node_id: db.new_node(),
             name: name
