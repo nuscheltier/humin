@@ -58,8 +58,10 @@ impl Groups {
 
 impl Organisation {
     fn new(db: &mut DB, name: String) -> Organisation {
+        let node = db.new_node();
+        db.find_node_by_id(node).unwrap().add_property("Name".to_string(), (&name).to_string());
         Organisation {
-            node_id: db.new_node(),
+            node_id: node,
             name: name
         }
     }
@@ -70,7 +72,8 @@ impl Organisation {
         db.find_edge_by_id(relation_id).unwrap().add_property("Rolle".to_string(), "Mitglied".to_string());
     }
 
-    pub fn change_name(&mut self, name: String) {
+    pub fn change_name(&mut self, db: &mut DB, name: String) {
+        db.find_node_by_id(self.node_id).unwrap().change_property("Name".to_string(), (&name).to_string());
         self.name = name;
     }
     
