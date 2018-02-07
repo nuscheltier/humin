@@ -68,13 +68,30 @@ impl Character {
         db.find_edge_by_id(relation_id).unwrap().add_property("Geburtstag".to_string(), time);
     }
 
-    pub fn change_birthday(&mut self, db: &mut DB, id: u64, time: String) {
+    pub fn change_birthday(&mut self, db: &mut DB, id: u64, new_id: u64, time: String) {
         let mut edges_orig: Vec<u64> = Vec::new();
         {
             let node = db.find_node_by_id(self.node_id).unwrap();
             edges_orig = node.get_origins().clone();
         }
-        //we have to delete the edge and create a new one to the date node
+        //we have to delete the edge... 
+        for org in edges_orig {
+            let mut edge_id: u64 = 0;
+            let mut edge_target: u64 = 0;
+            {
+                let edge = db.find_edge_by_id(org).unwrap();
+                if edge.get_properties().contains_key("Geburtstag") {
+                    edge_id = org;
+                    edge_target = edge.get_target();
+                }
+            }
+            //we need to delete the edge, but also delete a date-node if it isn't referenced
+            //anymore to prevent unneccessary data clutter within the database
+            db.clean_node(edge_target);
+            db.del_edge(org);
+        }
+        //... and create a new one to the date node
+        self.set_birthday(db, new_id, time);
 
         /*for edge in edges_orig {
             let mut e = db.find_edge_by_id(edge).unwrap();

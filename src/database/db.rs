@@ -253,6 +253,8 @@ impl DB {
 
     ////news
 
+    //Since we don't have any descriptive properties when creating a node, we can't safeguard this
+    //method.
     pub fn new_node(&mut self) -> u64 {
         let id = self.nodes.len() as u64;
         let node = Node::new(id);
@@ -270,6 +272,20 @@ impl DB {
     }
 
     ////dels
+
+    //this just takes a node and looks wether or not it is referenced. If not, then it can be
+    //deleted.
+    pub fn clean_node(&mut self, id: u64) {
+        let mut clean = false;
+        {
+            let mut node = self.nodes.get_mut(&id).unwrap();
+            clean = node.get_origins().len() == 0 && node.get_targets().len() == 0;
+        }
+
+        if clean {
+            self.nodes.remove(&id);
+        }
+    }
 
     //TODO: needs a result
     pub fn del_node(&mut self, id: u64) {
