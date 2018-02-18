@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 use super::super::database::db::DB as DB;
+//TODO: Struct Date
+//Date has a tuple (year, month, day)
 
 //A Date is connected to at least one event
 //every Event has one Date.
