@@ -51,3 +51,32 @@ impl Edge {
         self.properties.remove(&key);
     }
 }
+
+#[test]
+fn edge_test_new() {
+    let edge = Edge::new(1, 1, 1);
+    assert_eq!(edge.get_origin(), 1);
+    assert_eq!(edge.get_target(), 1);
+    assert_eq!(edge.get_id(), 1);
+}
+
+#[test]
+fn edge_properties() {
+    let mut edge = Edge::new(1, 1, 1);
+    edge.add_property("Test".to_string(), "test".to_string());
+    {
+        let prop = edge.get_properties();
+        assert_eq!(prop.get("Test"), Some(&("test".to_string())));
+    }
+    edge.change_property("Test".to_string(), "test2".to_string());
+    {
+        let prop2 = edge.get_properties();
+        assert_eq!(prop2.get("Test"), Some(&("test2".to_string())));
+    }
+    edge.remove_property("Test".to_string());
+    {
+        let prop3 = edge.get_properties();
+        assert_eq!(prop3.contains_key(&("Test".to_string())), false);
+        assert!(prop3.is_empty());
+    }
+}
