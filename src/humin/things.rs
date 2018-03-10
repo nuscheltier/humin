@@ -66,7 +66,7 @@ impl Things {
 impl Item {
     fn new(db: &mut DB, name: String, creator: u64, time: u64) -> Item {
         let node_id = db.new_node();
-        let node = db.find_node_by_id(node_id).unwrap();
+        let node = db.find_node_by_id_as_mut(node_id).unwrap();
         node.add_property("Name".to_string(), (&name).to_string());
         Item {
             node_id: node_id,

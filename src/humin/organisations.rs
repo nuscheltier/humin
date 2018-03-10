@@ -59,7 +59,7 @@ impl Groups {
 impl Organisation {
     fn new(db: &mut DB, name: String) -> Organisation {
         let node = db.new_node();
-        db.find_node_by_id(node).unwrap().add_property("Name".to_string(), (&name).to_string());
+        db.find_node_by_id_as_mut(node).unwrap().add_property("Name".to_string(), (&name).to_string());
         Organisation {
             node_id: node,
             name: name
@@ -69,11 +69,11 @@ impl Organisation {
     //free form role for members (like freelancer) will be added at a later date
     pub fn add_member(&mut self, db: &mut DB, id: u64) {
         let relation_id = db.new_edge(self.node_id, id);
-        db.find_edge_by_id(relation_id).unwrap().add_property("Rolle".to_string(), "Mitglied".to_string());
+        db.find_edge_by_id_as_mut(relation_id).unwrap().add_property("Rolle".to_string(), "Mitglied".to_string());
     }
 
     pub fn change_name(&mut self, db: &mut DB, name: String) {
-        db.find_node_by_id(self.node_id).unwrap().change_property("Name".to_string(), (&name).to_string());
+        db.find_node_by_id_as_mut(self.node_id).unwrap().change_property("Name".to_string(), (&name).to_string());
         self.name = name;
     }
     

@@ -183,8 +183,25 @@ impl DB {
         }
     }*/
     ////finds
+    ////immut
+    pub fn find_node_by_id(&self, id: u64) -> Result<&Node, IDError> {
+        if self.nodes.get(&id).is_some() {
+            return Ok(self.nodes.get(&id).unwrap());
+        } else {
+            return Err(IDError);
+        }
+    }
 
-    pub fn find_node_by_id(&mut self, id: u64) -> Result<&mut Node, IDError> {
+    pub fn find_edge_by_id(&self, id: u64) -> Result<&Edge, IDError> {
+        if self.edges.get(&id).is_some() {
+            return Ok(self.edges.get(&id).unwrap());
+        } else {
+            return Err(IDError);
+        }
+    }
+
+    ////mut
+    pub fn find_node_by_id_as_mut(&mut self, id: u64) -> Result<&mut Node, IDError> {
         if self.nodes.get(&id).is_some() {
             return Ok(self.nodes.get_mut(&id).unwrap());
         } else {
@@ -192,7 +209,7 @@ impl DB {
         }
     }
 
-    pub fn find_edge_by_id(&mut self, id: u64) -> Result<&mut Edge, IDError> {
+    pub fn find_edge_by_id_as_mut(&mut self, id: u64) -> Result<&mut Edge, IDError> {
         if self.edges.get(&id).is_some() {
             return Ok(self.edges.get_mut(&id).unwrap());
         } else {
@@ -265,8 +282,8 @@ impl DB {
     pub fn new_edge(&mut self, org: u64, tar: u64) -> u64 {
         let id = self.edges.len() as u64;
         let edge = Edge::new(id, org, tar);
-        self.find_node_by_id(org).unwrap().add_origin(id);
-        self.find_node_by_id(tar).unwrap().add_target(id);
+        self.find_node_by_id_as_mut(org).unwrap().add_origin(id);
+        self.find_node_by_id_as_mut(tar).unwrap().add_target(id);
         self.edges.insert(id, edge);
         id
     }

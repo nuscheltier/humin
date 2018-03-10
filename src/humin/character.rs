@@ -52,20 +52,20 @@ impl People {
 impl Character {
     fn new(db: &mut DB, name: String) -> Character {
         let node = db.new_node();
-        db.find_node_by_id(node).unwrap().add_property("Name".to_string(), (&name).to_string());
+        db.find_node_by_id_as_mut(node).unwrap().add_property("Name".to_string(), (&name).to_string());
         Character {
             node_id: node,
             name: name
         }
     }
     pub fn change_name(&mut self, db: &mut DB, name: String) {
-        db.find_node_by_id(self.node_id).unwrap().change_property("Name".to_string(), (&name).to_string());
+        db.find_node_by_id_as_mut(self.node_id).unwrap().change_property("Name".to_string(), (&name).to_string());
         self.name = name;
     }
 
     pub fn set_birthday(&mut self, db: &mut DB, id: u64, time: String) {
         let relation_id = db.new_edge(self.node_id, id);
-        db.find_edge_by_id(relation_id).unwrap().add_property("Geburtstag".to_string(), time);
+        db.find_edge_by_id_as_mut(relation_id).unwrap().add_property("Geburtstag".to_string(), time);
     }
 
     pub fn change_birthday(&mut self, db: &mut DB, id: u64, new_id: u64, time: String) {
