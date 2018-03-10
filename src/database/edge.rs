@@ -70,13 +70,13 @@ fn edge_properties() {
     }
     edge.change_property("Test".to_string(), "test2".to_string());
     {
-        let prop2 = edge.get_properties();
-        assert_eq!(prop2.get("Test"), Some(&("test2".to_string())));
+        let prop = edge.get_properties();
+        assert_eq!(prop.get("Test"), Some(&("test2".to_string())));
     }
     edge.remove_property("Test".to_string());
     {
-        let prop3 = edge.get_properties();
-        assert_eq!(prop3.contains_key(&("Test".to_string())), false);
-        assert!(prop3.is_empty());
+        let prop = edge.get_properties();
+        assert_eq!(prop.contains_key(&("Test".to_string())), false);
+        assert!(prop.is_empty());
     }
 }

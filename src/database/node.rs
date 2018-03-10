@@ -74,3 +74,72 @@ impl Node {
         self.properties.remove(&key);
     }
 }
+
+#[test]
+fn node_new_test() {
+    let node = Node::new(1);
+    assert_eq!(node.get_id(), 1);
+    assert!(node.get_origins().is_empty());
+    assert!(node.get_targets().is_empty());
+}
+
+#[test]
+fn node_origin_test() {
+    let mut node = Node::new(1);
+    node.add_origin(1);
+    node.add_origin(2);
+    assert!(node.get_targets().is_empty());
+    {
+        let origin = node.get_origins();
+        assert_eq!(origin[0], 1);
+        assert_eq!(origin[1], 2);
+        assert_eq!(origin.len(), 2);
+    }
+    node.del_origin(0);
+    {
+        let origin = node.get_origins();
+        assert_eq!(origin[0], 2);
+        assert_eq!(origin.len(), 1);
+    }
+}
+
+#[test]
+fn node_target_test() {
+    let mut node = Node::new(1);
+    node.add_target(1);
+    node.add_target(2);
+    assert!(node.get_origins().is_empty());
+    {
+        let target = node.get_targets();
+        assert_eq!(target[0], 1);
+        assert_eq!(target[1], 2);
+        assert_eq!(target.len(), 2);
+    }
+    node.del_target(0);
+    {
+        let target = node.get_targets();
+        assert_eq!(target[0], 2);
+        assert_eq!(target.len(), 1);
+    }
+}
+
+#[test]
+fn node_properties() {
+    let mut node = Node::new(1);
+    node.add_property("Test".to_string(), "test".to_string());
+    {
+        let prop = node.get_properties();
+        assert_eq!(prop.get("Test"), Some(&("test".to_string())));
+    }
+    node.change_property("Test".to_string(), "test2".to_string());
+    {
+        let prop = node.get_properties();
+        assert_eq!(prop.get("Test"), Some(&("test2".to_string())));
+    }
+    node.remove_property("Test".to_string());
+    {
+        let prop = node.get_properties();
+        assert_eq!(prop.contains_key(&("Test".to_string())), false);
+        assert!(prop.is_empty());
+    }
+}
